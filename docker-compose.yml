@@ -1,0 +1,28 @@
+version: '3'
+
+services:
+  backend:
+    build:
+      context: ./backend
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --root-path /api
+    ports:
+      - 8000:8000
+
+  frontend:
+    build:
+      context: ./frontend
+    volumes:
+      - react_build:/frontend/build
+
+  nginx:
+    image: nginx:latest
+    ports:
+     - 3000:8080
+    volumes:
+      - ./nginx/nginx-setup.conf:/etc/nginx/conf.d/default.conf:ro
+      - react_build:/var/www/react
+    depends_on:
+      - backend
+      - frontend
+volumes:
+  react_build:
